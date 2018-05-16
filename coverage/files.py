@@ -322,18 +322,11 @@ class PathAliases(object):
         string.  When mapping paths, if a path starts with a match against
         `pattern`, then that match is replaced with `result`.  This models
         isomorphic source trees being rooted at different places on two
-        different machines.
-
-        `pattern` can't end with a wildcard component, since that would
-        match an entire tree, and not just its root.
-
+        different machines.  Note: wildcards will also match path separators.
         """
         if len(pattern) > 1:
             pattern = pattern.rstrip(r"\/")
 
-        # The pattern can't end with a wildcard component.
-        if pattern.endswith("*"):
-            raise CoverageException("Pattern must not end with wildcards.")
         pattern_sep = sep(pattern)
 
         # The pattern is meant to match a filepath.  Let's make it absolute

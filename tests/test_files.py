@@ -201,6 +201,7 @@ class PathAliasesTest(CoverageTest):
         aliases = PathAliases()
         aliases.add('/ned/home/*/src', './mysrc')
         self.assert_mapped(aliases, '/ned/home/foo/src/a.py', './mysrc/a.py')
+        self.assert_mapped(aliases, '/ned/home/f/src/m/a.py', './mysrc/m/a.py')
 
         aliases = PathAliases()
         aliases.add('/ned/home/*/src/', './mysrc')
@@ -218,15 +219,12 @@ class PathAliasesTest(CoverageTest):
         self.assert_mapped(aliases, '/home/foo/src/a.py', './mysrc/a.py')
         self.assert_mapped(aliases, '/lib/foo/libsrc/a.py', './mylib/a.py')
 
-    def test_cant_have_wildcard_at_end(self):
+    def test_wildcard_at_end(self):
         aliases = PathAliases()
-        msg = "Pattern must not end with wildcards."
-        with self.assertRaisesRegex(CoverageException, msg):
-            aliases.add("/ned/home/*", "fooey")
-        with self.assertRaisesRegex(CoverageException, msg):
-            aliases.add("/ned/home/*/", "fooey")
-        with self.assertRaisesRegex(CoverageException, msg):
-            aliases.add("/ned/home/*/*/", "fooey")
+        aliases.add("/ned/home/run-*/", "./mysrc")
+        self.assert_mapped(aliases, '/ned/home/run-23/a.py', './mysrc/a.py')
+        self.assert_mapped(aliases, '/ned/home/run-3/m/a.py', './mysrc/a.py')
+        self.assert_unchanged(aliases, '/ned/home/manualrun/a.py')
 
     def test_no_accidental_munging(self):
         aliases = PathAliases()
